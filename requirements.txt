@@ -1,0 +1,13 @@
+# FLAC Converter Requirements
+# This application uses Python standard library modules only
+# No additional Python packages are required
+
+# System Requirements:
+# - Python 3.6 or higher
+# - ffmpeg (must be installed separately)
+# - tkinter (usually included with Python)
+
+# Optional dependencies for development:
+# - pytest (for testing)
+# - black (for code formatting)
+# - flake8 (for linting)
