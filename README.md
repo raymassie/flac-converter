@@ -1,4 +1,4 @@
-# Audio Converter
+# AudioConverter
 
 A GUI application for batch-converting audio files between FLAC, WAV, AIFF, AAC and MP3
 using ffmpeg, preserving the original folder structure.
