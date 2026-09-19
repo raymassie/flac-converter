@@ -1,177 +1,163 @@
-# FLAC Converter
+# Audio Converter
 
-A modern, user-friendly GUI application for converting audio files to FLAC format while preserving the original folder structure.
+A GUI application for batch-converting audio files between FLAC, WAV, AIFF, AAC and MP3
+using ffmpeg, preserving the original folder structure.
 
-![FLAC Converter](https://img.shields.io/badge/Python-3.6+-blue.svg)
+Formerly "FLAC Converter". Renamed when multi-format output was added.
+
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 
 ## Features
 
-- 🎵 **High-Quality Conversion**: Converts various audio formats to FLAC using ffmpeg
-- 📁 **Folder Structure Preservation**: Maintains original directory hierarchy in output
-- 🛑 **Stop/Resume**: Ability to stop conversion mid-process
-- 📊 **Progress Tracking**: Real-time progress bar and file status
-- 🎨 **Modern UI**: Clean, intuitive interface with file preview
-- 🔄 **Batch Processing**: Convert multiple files or entire folders at once
+- **Five output formats**: FLAC, WAV, AIFF, AAC (.m4a), MP3
+- **Drag and drop**: drop files or folders straight onto the window
+- **Multiple folders**: on macOS the folder chooser takes several at once (shift-click
+  or cmd-click); elsewhere it asks whether you want to add another after each one
+- **Background folder scanning**: large folders are scanned off the UI thread, with live
+  progress and Esc to cancel
+- **Folder structure preservation**: output mirrors the input hierarchy
+- **Save in place**: optionally write converted files next to their originals
+- **Skip files already in the target format**, marked as Skipped in the list
+- **Move originals to Trash** after conversion is verified (optional, off by default)
+- **Cover art and tags preserved** where the output container supports them
+- **Cancel mid-run**: the Start button becomes In Progress and stops the job when clicked
+- **De-duplication**: adding the same folder twice will not queue anything twice
+- **Readable failures**: destination folders are checked for writability before a run,
+  and every failure reports its reason
 
-## Supported Formats
+## Output format settings
 
-**Input Formats:**
-- M4A, MP3, WAV, AAC, OGG, AIFF, FLAC
+| Format | Extension | Encoder | Settings |
+|---|---|---|---|
+| FLAC | `.flac` | flac | `-compression_level 8` (lossless, smallest) |
+| WAV | `.wav` | pcm_s16le | 16-bit PCM |
+| AIFF | `.aiff` | pcm_s16be | 16-bit PCM |
+| AAC | `.m4a` | aac | 256 kbps |
+| MP3 | `.mp3` | libmp3lame | 320 kbps |
 
-**Output Format:**
-- FLAC (Free Lossless Audio Codec)
+Only formats your ffmpeg build can actually encode appear in the dropdown.
 
 ## Requirements
 
-- Python 3.6 or higher
-- ffmpeg (for audio conversion)
-- tkinter (usually included with Python)
+- Python 3.9 or higher, built with tkinter support
+- ffmpeg
+- `tkinterdnd2` (drag and drop) and `send2trash` (Trash support), both via pip
 
 ## Installation
 
-### 1. Install ffmpeg
-
-**macOS (using Homebrew):**
 ```bash
-brew install ffmpeg
+brew install ffmpeg python-tk     # macOS
+./setup.sh
 ```
 
-**Windows:**
-- Download ffmpeg from [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
-- Add to your system PATH
+`setup.sh` verifies Python, tkinter and ffmpeg, creates the virtual environment,
+and installs the pip dependencies.
 
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt update
-sudo apt install ffmpeg
-```
-
-### 2. Clone the Repository
+## Running
 
 ```bash
-git clone https://github.com/yourusername/flac-converter.git
-cd flac-converter
-```
-
-### 3. Run the Application
-
-```bash
-python3 flac_converter_app.py
+./run_app.sh
+# or
+python3 audio_converter_app.py
+# or double-click "Launch Audio Converter.command"
 ```
 
 ## Usage
 
-1. **Select Files**: Click "📁 Select Files" to choose individual audio files
-2. **Select Folder**: Click "📂 Select Folder" to convert all audio files in a directory
-3. **Review**: Check the file list to see what will be converted
-4. **Convert**: Click "🔄 Start Conversion" and choose your output directory
-5. **Monitor**: Watch the progress bar and file status updates
-6. **Stop**: Click "🛑 Stop Conversion" to interrupt the process if needed
+1. **Add files**: drag files or folders onto the window, or use **Select** for a file
+   or folder chooser. On macOS the folder chooser is the native panel and accepts
+   multiple folders at once via shift-click or cmd-click; on other platforms Tk allows
+   only one per dialog, so you are asked whether to add another after each. Folders are
+   scanned recursively in the background; press **Esc** to cancel a scan that is taking
+   too long.
+2. **Choose an output location**: click **Destination**, or tick
+   **Save to same folder as originals**.
+3. **Pick a format** from the dropdown.
+4. **Start**. The button reads **In Progress** during the run; click it to stop after
+   the current file. It reads **Complete** when the job finishes.
 
-## Folder Structure Preservation
+Select a row and press Delete or Backspace to remove it from the list. **Double-click**
+a row to see its full status, source and destination paths, and any error.
 
-The application intelligently preserves your original folder structure:
+## Deleting originals
 
-**Example:**
+**Delete original files** moves each source file to the Trash, but only after the
+conversion has been verified: ffmpeg exited cleanly, the output file exists, and it is
+not zero bytes. Files that were **skipped** or that **failed** are never deleted.
+
+On macOS this uses Finder via `osascript` if `send2trash` is not installed. On other
+platforms `send2trash` is required; without it the originals are kept and the status
+column says so.
+
+## Folder structure preservation
+
+The common root of everything you add is calculated, and each file's path relative to
+that root is recreated under the destination.
+
 ```
 Input:
 Music/
 ├── Artist1/
-│   ├── Album1/
-│   │   └── song1.m4a
-│   └── Album2/
-│       └── song3.m4a
-└── Artist2/
-    └── Album2/
-        └── Disc1/
-            └── song2.m4a
+│   ├── Album1/song1.m4a
+│   └── Album2/song3.m4a
+└── Artist2/Album2/Disc1/song2.m4a
 
-Output (converted folder):
+Output:
 converted/
 ├── Artist1/
-│   ├── Album1/
-│   │   └── song1.flac
-│   └── Album2/
-│       └── song3.flac
-└── Artist2/
-    └── Album2/
-        └── Disc1/
-            └── song2.flac
+│   ├── Album1/song1.flac
+│   └── Album2/song3.flac
+└── Artist2/Album2/Disc1/song2.flac
 ```
 
-## Features in Detail
+## When something fails
 
-### Smart Folder Detection
-- Automatically calculates the common root directory
-- Preserves relative folder structure from the common root
-- Handles nested directories and complex folder hierarchies
+If any file fails, a dialog lists each one with its reason, and the full list is written
+to `~/audio_converter_last_run.log`. Double-click a row for that file's error.
 
-### Conversion Control
-- **Start/Stop**: Toggle between start and stop modes
-- **Progress Tracking**: Real-time progress bar and percentage
-- **File Status**: Individual file conversion status (Pending, Success, Failed)
-- **Graceful Stop**: Stops between files, not mid-conversion
+Before a run starts, every destination folder is probed with a real test write. Folders
+that cannot be written to are named up front and you choose whether to continue. This
+catches read-only folders that `os.access()` reports as writable because of ACLs.
 
-### User Interface
-- **File Preview**: See file names, paths, and sizes before conversion
-- **Responsive Design**: Resizable window with proper column sizing
-- **Status Updates**: Clear status messages and progress indicators
-- **Error Handling**: User-friendly error messages and validation
+## Known limitations
 
-## Technical Details
-
-- **Audio Engine**: Uses ffmpeg for high-quality audio conversion
-- **Threading**: Background conversion with responsive UI
-- **Path Handling**: Robust cross-platform path management
-- **Error Recovery**: Graceful handling of conversion failures
+- **Skipping is by file extension, not by codec.** An `.m4a` containing ALAC is treated
+  as already-AAC and skipped when AAC is the target. Convert to a different format, or
+  remove the extension from the format's alias set, if that matters to you.
+- **Conversion is serial.** One ffmpeg process at a time regardless of core count.
+- **WAV and AIFF cannot carry cover art.** Art is stripped for those targets. Tags are
+  preserved where the container supports them.
+- **Cancel stops between files** in the common case. If ffmpeg is mid-file it is killed
+  and the partial output is removed, but this path is less exercised than the rest.
+- Files are converted at a per-file timeout of 15 minutes; anything slower is killed and
+  marked Failed.
+- **A single folder scan stops at 20,000 audio files.** Hidden directories, `node_modules`,
+  `~/Library` and system paths such as `/System` and `/private` are skipped, and symlinks
+  are not followed. Picking a drive root or your home folder prompts for confirmation
+  first, because scanning either one is rarely what you meant.
 
 ## Troubleshooting
 
-### ffmpeg Not Found
-If you get an "ffmpeg not found" error:
-1. Ensure ffmpeg is installed and in your system PATH
-2. On macOS, try: `brew install ffmpeg`
-3. Restart the application after installing ffmpeg
+**ffmpeg not found** — `brew install ffmpeg`, then restart the app.
 
-### Conversion Failures
-- Check that input files are not corrupted
-- Ensure you have write permissions to the output directory
-- Verify the input file format is supported
+**Drag and drop does nothing** — `tkinterdnd2` is missing. `pip install tkinterdnd2`,
+or use the Select button. The status bar says which state you are in at launch.
 
-### Performance Tips
-- Convert files in smaller batches for better performance
-- Use SSD storage for faster file I/O
-- Close other applications to free up system resources
+**No module named tkinter** — your Python was built without Tk. On macOS with Homebrew,
+`brew install python-tk`.
 
-## Contributing
+**Every file failed, or "Permission denied"** — the destination folder is read-only.
+This is common with album folders imported by other software: the folder can be mode
+`r-xr-xr-x` even though the audio files inside it are writable. In Finder, select the
+folder, press Cmd-I, and unlock it under Sharing & Permissions. Or from a terminal:
+`chmod u+w "/path/to/folder"`. To find every locked folder under a library:
+`find ~/Music -type d ! -perm -u+w`.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+**Originals were not deleted** — the conversion failed verification, the file was
+skipped, or Trash was unavailable. The status column and status bar say which.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with Python and tkinter
-- Audio conversion powered by ffmpeg
-- Icons and emojis for enhanced user experience
-
-## Support
-
-If you encounter any issues or have questions:
-1. Check the troubleshooting section above
-2. Search existing issues on GitHub
-3. Create a new issue with detailed information about your problem
-
----
-
-**Enjoy high-quality audio conversion with FLAC Converter!** 🎵
+MIT. See [LICENSE](LICENSE).

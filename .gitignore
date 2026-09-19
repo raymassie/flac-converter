@@ -159,8 +159,5 @@ env/
 backup/
 *_backup.py
 
-# macOS command files
-*.command
-
 # Shell scripts (optional - uncomment if you don't want to include them)
 # *.sh

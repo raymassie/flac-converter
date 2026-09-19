@@ -1,25 +1,21 @@
 #!/usr/bin/env python3
 """
-FLAC Converter Launch Script
-Simple launcher for the FLAC Converter application
+Audio Converter launch script.
 """
 
 import sys
-import os
 from pathlib import Path
 
-# Add the current directory to Python path
-current_dir = Path(__file__).parent
-sys.path.insert(0, str(current_dir))
+sys.path.insert(0, str(Path(__file__).parent))
 
-# Import and run the application
 try:
-    from flac_converter_app import main
+    from audio_converter_app import main
     main()
-except ImportError as e:
-    print(f"Error importing FLAC Converter: {e}")
-    print("Make sure flac_converter_app.py is in the same directory as this script.")
+except ImportError as exc:
+    print("Error importing Audio Converter: %s" % exc)
+    print("Make sure audio_converter_app.py is in the same directory as this script,")
+    print("and that dependencies are installed:  pip install -r requirements.txt")
     sys.exit(1)
-except Exception as e:
-    print(f"Error running FLAC Converter: {e}")
+except Exception as exc:
+    print("Error running Audio Converter: %s" % exc)
     sys.exit(1)

@@ -1,13 +1,14 @@
-# FLAC Converter Requirements
-# This application uses Python standard library modules only
-# No additional Python packages are required
+# Audio Converter dependencies
+#
+# System requirements (not installable via pip):
+#   - Python 3.9 or higher, built with tkinter support
+#     (Homebrew: brew install python-tk)
+#   - ffmpeg          (Homebrew: brew install ffmpeg)
 
-# System Requirements:
-# - Python 3.6 or higher
-# - ffmpeg (must be installed separately)
-# - tkinter (usually included with Python)
+# Drag-and-drop support for files and folders.
+# Without it the app still runs; the Select button is the only way to add files.
+tkinterdnd2>=0.3.0
 
-# Optional dependencies for development:
-# - pytest (for testing)
-# - black (for code formatting)
-# - flake8 (for linting)
+# Cross-platform "move to Trash" for the Delete original files option.
+# On macOS the app falls back to Finder via osascript if this is absent.
+send2trash>=1.8.0

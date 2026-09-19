@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# FLAC Converter App Launcher
-# Simple script to run the drag & drop FLAC converter
+# Audio Converter launcher
 
-echo "🎵 Starting FLAC Converter App..."
-echo ""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# Check if virtual environment exists
-if [ ! -d "venv" ]; then
-    echo "⚠️  Virtual environment not found. Running setup..."
-    ./setup.sh
+if [ ! -x "venv/bin/python" ]; then
+    echo "Virtual environment not found. Running setup..."
+    ./setup.sh || exit 1
 fi
 
-# Activate virtual environment and run app
-echo "🚀 Launching FLAC Converter App..."
-source venv/bin/activate
-python3 flac_converter_app.py
+echo "Starting Audio Converter..."
+exec venv/bin/python audio_converter_app.py
