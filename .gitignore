@@ -161,3 +161,11 @@ backup/
 
 # Shell scripts (optional - uncomment if you don't want to include them)
 # *.sh
+
+# Icon working files (the app bundle's own copy is what ships)
+AppIcon-source.png
+/AppIcon.icns
+AppIcon.iconset/
+
+# Downloads folder
+Claude outputs/

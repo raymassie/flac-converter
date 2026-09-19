@@ -39,30 +39,65 @@ Formerly "FLAC Converter". Renamed when multi-format output was added.
 
 Only formats your ffmpeg build can actually encode appear in the dropdown.
 
-## Requirements
+## What you need first
 
-- Python 3.9 or higher, built with tkinter support
-- ffmpeg
-- `tkinterdnd2` (drag and drop) and `send2trash` (Trash support), both via pip
+Two things have to be on your computer before Audio Converter will run. Both are
+one-line installs.
 
-## Installation
+- **ffmpeg** — this is the program that actually converts the audio. On macOS:
+  `brew install ffmpeg`
+- **Python 3.9 or newer, with tkinter** — this draws the app's window. Most Macs
+  already have Python, but the window part is often missing. On macOS:
+  `brew install python-tk`
 
-```bash
-brew install ffmpeg python-tk     # macOS
-./setup.sh
-```
+If you don't have Homebrew (the `brew` command), install it first from
+[brew.sh](https://brew.sh).
 
-`setup.sh` verifies Python, tkinter and ffmpeg, creates the virtual environment,
-and installs the pip dependencies.
+Everything else the app needs is installed for you in the next step.
 
-## Running
+## Setting it up (once)
+
+1. Download this folder to your computer and remember where you put it.
+2. Open Terminal, type `cd ` (with a space), then drag the folder onto the
+   Terminal window and press Return. This moves Terminal into the folder.
+3. Type `./setup.sh` and press Return.
+
+`setup.sh` checks that Python and ffmpeg are present, creates a self-contained
+`venv` folder for the app's own dependencies, and installs them there. It does not
+touch anything else on your system. If you see "permission denied", run
+`chmod +x setup.sh` first and try again.
+
+You only ever do this once.
+
+## Running it
+
+**The easy way.** Double-click **Audio Converter** in this folder. That's the app
+icon. No Terminal window, nothing to type.
+
+To keep it handy, right-click it and choose **Make Alias**, then drag the alias to
+your Dock or your Applications folder. Use an alias, not a copy. The app is a thin
+launcher that runs the Python file sitting next to it, so a copy moved somewhere
+else can't find it and will tell you so rather than starting.
+
+**From Terminal**, if you prefer, from inside the folder:
 
 ```bash
 ./run_app.sh
-# or
-python3 audio_converter_app.py
-# or double-click "Launch Audio Converter.command"
 ```
+
+**Running the Python directly**, useful if something is going wrong and you want
+to see the error messages:
+
+```bash
+venv/bin/python audio_converter_app.py
+```
+
+Use `venv/bin/python` rather than plain `python3` here. The `venv` folder is where
+setup put the app's dependencies, so plain `python3` will usually complain that
+`tkinterdnd2` is missing.
+
+If the app ever fails to start on the very first launch, it writes what went wrong
+to `/tmp/audio_converter_setup.log`.
 
 ## Usage
 
