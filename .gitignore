@@ -169,3 +169,8 @@ AppIcon.iconset/
 
 # Downloads folder
 Claude outputs/
+
+# The app bundle is a local double-click launcher tied to this exact folder.
+# It only works for a git clone (never quarantined) run from its original path,
+# so it isn't distributed via the zip download and stays out of the repo.
+Audio Converter.app/

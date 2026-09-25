@@ -57,33 +57,46 @@ Everything else the app needs is installed for you in the next step.
 
 ## Setting it up (once)
 
-1. Download this folder to your computer and remember where you put it.
-2. Open Terminal, type `cd ` (with a space), then drag the folder onto the
-   Terminal window and press Return. This moves Terminal into the folder.
-3. Type `./setup.sh` and press Return.
+Get the project with `git clone`, not the GitHub "Download ZIP" button. A zip
+extracts with a macOS quarantine flag on every file, which blocks the app icon
+below from running at all (it can still run from Terminal, but skip the hassle):
+
+```bash
+git clone https://github.com/raymassie/AudioConverter.git
+cd AudioConverter
+```
+
+Then:
+
+1. Open Terminal in that folder (the `cd` above already did this if you're
+   following along, otherwise type `cd `, with a space, then drag the folder onto
+   the Terminal window and press Return).
+2. Type `./setup.sh` and press Return.
 
 `setup.sh` checks that Python and ffmpeg are present, creates a self-contained
 `venv` folder for the app's own dependencies, and installs them there. It does not
 touch anything else on your system. If you see "permission denied", run
 `chmod +x setup.sh` first and try again.
 
-You only ever do this once.
+You only ever do this once per machine.
 
 ## Running it
 
-**The easy way.** Double-click **Audio Converter** in this folder. That's the app
-icon. No Terminal window, nothing to type.
+**From Terminal**, from inside the folder:
+
+```bash
+./run_app.sh
+```
+
+**The easy way**, once it's set up: double-click **Audio Converter.app**, which
+`setup.sh` leaves in the same folder. That's the app icon. No Terminal window,
+nothing to type. This only works because you cloned rather than downloaded a
+zip — see above.
 
 To keep it handy, right-click it and choose **Make Alias**, then drag the alias to
 your Dock or your Applications folder. Use an alias, not a copy. The app is a thin
 launcher that runs the Python file sitting next to it, so a copy moved somewhere
 else can't find it and will tell you so rather than starting.
-
-**From Terminal**, if you prefer, from inside the folder:
-
-```bash
-./run_app.sh
-```
 
 **Running the Python directly**, useful if something is going wrong and you want
 to see the error messages:
@@ -182,6 +195,17 @@ or use the Select button. The status bar says which state you are in at launch.
 
 **No module named tkinter** — your Python was built without Tk. On macOS with Homebrew,
 `brew install python-tk`.
+
+**App quits instantly, or crashes with `Tcl_Panic` / `TkpInit`** — you're on the old
+Tcl/Tk 8.5 that ships with macOS's Command Line Tools Python, which is known to crash
+on newer macOS versions. Install Python from
+[python.org/downloads/macos](https://www.python.org/downloads/macos/) instead (it
+bundles a working Tk 8.6), then rebuild the venv against it:
+```bash
+rm -rf venv
+/Library/Frameworks/Python.framework/Versions/3.*/bin/python3 -m venv --system-site-packages venv
+venv/bin/python -m pip install -r requirements.txt
+```
 
 **Every file failed, or "Permission denied"** — the destination folder is read-only.
 This is common with album folders imported by other software: the folder can be mode
